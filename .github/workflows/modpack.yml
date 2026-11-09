@@ -1,0 +1,66 @@
+name: modpack
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modpack/**'
+      - 'tools/make-manifest.ps1'
+      - '.github/workflows/modpack.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: preparer la release
+        shell: pwsh
+        run: |
+          gh release view modpack --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create modpack --repo $env:GITHUB_REPOSITORY --title modpack --notes "contenu du modpack"
+          }
+
+      - name: envoyer les fichiers manquants
+        shell: pwsh
+        run: |
+          $existing = @(gh release view modpack --repo $env:GITHUB_REPOSITORY --json assets --jq '.assets[].name')
+          $staging = Join-Path $env:RUNNER_TEMP 'staging'
+          New-Item -ItemType Directory -Force -Path $staging | Out-Null
+
+          $wanted = @()
+
+          Get-ChildItem -Path modpack -Recurse -File | Where-Object { $_.Name -ne 'pack.json' } | ForEach-Object {
+            $sha1 = (Get-FileHash $_.FullName -Algorithm SHA1).Hash.ToLower()
+            $asset = "$sha1-$($_.Name)"
+            $wanted += $asset
+            if ($existing -notcontains $asset) {
+              Copy-Item $_.FullName (Join-Path $staging $asset)
+            }
+          }
+
+          $upload = @(Get-ChildItem $staging -File | ForEach-Object { $_.FullName })
+          if ($upload.Count -gt 0) {
+            gh release upload modpack $upload --repo $env:GITHUB_REPOSITORY --clobber
+          }
+
+          $existing | Where-Object { $wanted -notcontains $_ } | ForEach-Object {
+            gh release delete-asset modpack $_ --repo $env:GITHUB_REPOSITORY --yes
+          }
+
+      - name: regenerer le manifeste
+        shell: pwsh
+        run: |
+          ./tools/make-manifest.ps1 -PackDirectory modpack -BaseUrl "https://github.com/$env:GITHUB_REPOSITORY/releases/download/modpack" -OutputPath manifest.json
+          git config user.name 'github-actions'
+          git config user.email 'github-actions@github.com'
+          git add manifest.json
+          git commit -m "maj manifeste modpack"
+          git push

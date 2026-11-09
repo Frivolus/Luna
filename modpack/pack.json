@@ -1,0 +1,8 @@
+{
+  "name": "Luna - base",
+  "mcVersion": "1.21.1",
+  "loader": "Fabric",
+  "loaderVersion": "0.16.5",
+  "ramMb": 4096,
+  "jvmArgs": []
+}

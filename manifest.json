@@ -1,17 +1,31 @@
-﻿{
-  "schema": 1,
-  "name": "Luna - base",
-  "mcVersion": "1.21.1",
-  "loader": "Fabric",
-  "loaderVersion": "0.16.5",
-  "ramMb": 4096,
-  "jvmArgs": [],
-  "files": [
-    {
-      "path": "assets/luna-test.txt",
-      "url": "https://raw.githubusercontent.com/Frivolus/Luna/main/assets/luna-test.txt",
-      "sha1": "9a94f4d1c28fd24914ab51ca866b212795e5f343",
-      "size": 37
-    }
-  ]
+{
+    "schema":  1,
+    "name":  "Luna - base",
+    "mcVersion":  "1.21.1",
+    "loader":  "Fabric",
+    "loaderVersion":  "0.16.5",
+    "ramMb":  4096,
+    "jvmArgs":  [
+
+                ],
+    "files":  [
+                  {
+                      "path":  "assets/luna-test.txt",
+                      "url":  "https://github.com/Frivolus/Luna/releases/download/modpack/9a94f4d1c28fd24914ab51ca866b212795e5f343-luna-test.txt",
+                      "sha1":  "9a94f4d1c28fd24914ab51ca866b212795e5f343",
+                      "size":  37
+                  },
+                  {
+                      "path":  "config/.gitkeep",
+                      "url":  "https://github.com/Frivolus/Luna/releases/download/modpack/0818385a034c99b483a268be6bb8a75309b9f317-.gitkeep",
+                      "sha1":  "0818385a034c99b483a268be6bb8a75309b9f317",
+                      "size":  8
+                  },
+                  {
+                      "path":  "mods/.gitkeep",
+                      "url":  "https://github.com/Frivolus/Luna/releases/download/modpack/7cf370b5e5705ef1b99251a827e1a7147e91f151-.gitkeep",
+                      "sha1":  "7cf370b5e5705ef1b99251a827e1a7147e91f151",
+                      "size":  6
+                  }
+              ]
 }
