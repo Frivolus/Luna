@@ -6,5 +6,12 @@
   "loaderVersion": "0.16.5",
   "ramMb": 4096,
   "jvmArgs": [],
-  "files": []
+  "files": [
+    {
+      "path": "assets/luna-test.txt",
+      "url": "https://raw.githubusercontent.com/Frivolus/Luna/main/assets/luna-test.txt",
+      "sha1": "9a94f4d1c28fd24914ab51ca866b212795e5f343",
+      "size": 37
+    }
+  ]
 }

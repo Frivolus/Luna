@@ -1,4 +1,5 @@
-﻿using CmlLib.Core.Auth;
+﻿using System.IO;
+using CmlLib.Core.Auth;
 using Luna.Models;
 using Luna.Mvvm;
 using Luna.Services;
@@ -10,6 +11,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly ManifestService _manifests = new();
     private readonly AccountStore _accounts = new();
     private readonly MicrosoftAuthService _microsoft = new();
+    private readonly FileSyncService _sync = new();
 
     private string _username = string.Empty;
     private bool _isMicrosoft;
@@ -17,10 +19,12 @@ public sealed class MainViewModel : ObservableObject
     private string _versionText = "Chargement du manifeste...";
     private Manifest? _manifest;
     private MSession? _session;
+    private bool _isBusy;
+    private double _progressValue;
 
     public MainViewModel()
     {
-        PlayCommand = new RelayCommand(Play, () => CanPlay);
+        PlayCommand = new AsyncRelayCommand(PlayAsync, () => CanPlay);
         ConnectMicrosoftCommand = new AsyncRelayCommand(ConnectMicrosoftAsync, () => _session is null);
         UseOfflineCommand = new RelayCommand(() => IsMicrosoft = false);
         UseMicrosoftCommand = new RelayCommand(() => IsMicrosoft = true);
@@ -41,7 +45,7 @@ public sealed class MainViewModel : ObservableObject
         _ = LoadManifestAsync();
     }
 
-    public RelayCommand PlayCommand { get; }
+    public AsyncRelayCommand PlayCommand { get; }
     public AsyncRelayCommand ConnectMicrosoftCommand { get; }
     public RelayCommand UseOfflineCommand { get; }
     public RelayCommand UseMicrosoftCommand { get; }
@@ -112,6 +116,21 @@ public sealed class MainViewModel : ObservableObject
     }
 
     public string VersionLabel => AppInfo.Version;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        private set => Set(ref _isBusy, value);
+    }
+
+    public double ProgressValue
+    {
+        get => _progressValue;
+        private set => Set(ref _progressValue, value);
+    }
+
+    public static string GameDirectory => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Luna", "game");
 
     public bool CanPlay => _manifest is not null
         && (_isMicrosoft ? _session is not null : _username.Trim().Length >= 3);
@@ -185,6 +204,7 @@ public sealed class MainViewModel : ObservableObject
     {
         PlayCommand.RaiseCanExecuteChanged();
         ConnectMicrosoftCommand.RaiseCanExecuteChanged();
+        Raise(nameof(IsBusy));
         Raise(nameof(CanPlay));
 
         if (_manifest is null) return;
@@ -197,8 +217,30 @@ public sealed class MainViewModel : ObservableObject
             Status = "Pseudo trop court (3 caracteres minimum).";
     }
 
-    private void Play()
+    private async Task PlayAsync()
     {
-        Status = "Lancement pas encore implemente.";
+        if (_manifest is null) return;
+
+        IsBusy = true;
+        ProgressValue = 0;
+
+        try
+        {
+            var progress = new Progress<SyncProgress>(p =>
+            {
+                ProgressValue = p.Total == 0 ? 100 : p.Done * 100.0 / p.Total;
+                Status = p.Current == "termine" ? "Fichiers a jour." : "Synchronisation : " + p.Current;
+            });
+
+            var result = await _sync.ApplyAsync(_manifest, GameDirectory, progress, CancellationToken.None);
+
+            Status = result.Ok
+                ? "Fichiers a jour. Lancement pas encore implemente."
+                : "Echec de synchronisation : " + result.Error;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 }
