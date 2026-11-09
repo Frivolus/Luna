@@ -5,8 +5,8 @@
 ## Position
 
 - Phase : 0 — fondations
-- Derniere action : synchronisation sha1 validee (telechargement, idempotence, nettoyage), mode --sync
-- Prochaine action : lancement du jeu via CmlLib
+- Derniere action : lancement valide, jeu demarre (runtime java auto-installe)
+- Prochaine action : cabler Play sur sync + lancement, journal de sortie dans l UI
 
 ## Fait
 
@@ -22,7 +22,7 @@
 - [x] Compte hors-ligne (pseudo, UUID deterministe, persistance)
 - [x] Compte Microsoft (WebView2, restauration silencieuse)
 - [x] Synchronisation des mods avec verification sha1
-- [ ] Lancement via CmlLib
+- [x] Lancement via CmlLib (installation, runtime java auto)
 - [ ] Journal de sortie, erreurs, progression
 - [ ] Publication : installeur + manifeste via GitHub Actions
 

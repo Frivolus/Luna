@@ -77,3 +77,11 @@
 - Mode `--sync` ajoute pour tester sans UI. `StartupUri` retire du XAML : WPF refuse `StartupUri = null`, la fenetre est creee a la main.
 - `JsonStringEnumConverter` requis sur `LoaderKind`.
 - Prochain chantier : lancement via CmlLib (CreateProcessAsync + MLaunchOption).
+
+## Mise a jour 09/11/2026 (3)
+
+- Lancement valide : 1.21.1 installe, runtime Java Mojang extrait automatiquement, javaw demarre et tient.
+- Ordre obligatoire : `GetVersionAsync` -> `InstallAsync` -> `GetJavaPath` -> `BuildProcess`. Inverser fait echouer la resolution Java.
+- `GetJavaPath` et `GetDefaultJavaPath` sont synchrones ; `BuildProcess` est synchrone, `BuildProcessAsync` prend un nom de version.
+- Mode `--launch` (+ `--wait`) pour tester en headless, journal dans %TEMP%\luna-launch.log.
+- Prochain chantier : cabler Play sur sync + lancement et afficher le journal dans l UI.
