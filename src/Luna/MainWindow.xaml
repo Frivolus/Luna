@@ -47,6 +47,10 @@
                     <ui:TextBox PlaceholderText="Trois caracteres minimum"
                                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
 
+                    <TextBlock Text="{Binding UuidText}" FontSize="11" Margin="0,6,0,0"
+                               TextTrimming="CharacterEllipsis"
+                               Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}" />
+
                     <ui:Button Content="Se connecter avec Microsoft" Margin="0,18,0,0"
                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                                Command="{Binding ConnectMicrosoftCommand}" />

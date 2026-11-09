@@ -64,3 +64,9 @@
 ## Journal
 
 - 09/11/2026 : depot cree, scaffold WPF, CmlLib.Core ajoute, build verte.
+## Mise a jour 09/11/2026
+
+- UI passee sur WPF-UI 4.3.0 : theme sombre, fond Mica, FluentWindow, Card, Button. Pas d'Electron, jamais.
+- Manifeste : modele, lecture HTTP, validation stricte (schema, version, RAM, chemins, sha1, https), manifest.json a la racine.
+- Compte hors-ligne : UUID v3 MD5 de "OfflinePlayer:<pseudo>", persistance dans %APPDATA%\Luna\account.json, restauration au demarrage.
+- Prochain chantier : compte Microsoft (CmlLib.Core.Auth.Microsoft, device code).

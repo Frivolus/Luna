@@ -5,8 +5,8 @@
 ## Position
 
 - Phase : 0 — fondations
-- Derniere action : scaffold WPF, CmlLib.Core 4.1.0, build verte
-- Prochaine action : coquille WPF (fenetre, selection de compte, Play desactive)
+- Derniere action : compte hors-ligne (UUID deterministe, persistance) et manifeste distant
+- Prochaine action : compte Microsoft via device code
 
 ## Fait
 
@@ -17,9 +17,9 @@
 
 ## A faire (ordre impose)
 
-- [ ] Coquille WPF : fenetre, selection de compte, Play desactive
-- [ ] Modele de manifeste + lecture distante et validation
-- [ ] Compte hors-ligne (pseudo, UUID deterministe, persistance)
+- [x] Coquille WPF : fenetre, selection de compte, Play desactive
+- [x] Modele de manifeste + lecture distante et validation
+- [x] Compte hors-ligne (pseudo, UUID deterministe, persistance)
 - [ ] Compte Microsoft via device code
 - [ ] Synchronisation des mods avec verification sha1
 - [ ] Lancement via CmlLib

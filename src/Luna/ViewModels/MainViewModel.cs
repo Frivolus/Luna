@@ -7,6 +7,7 @@ namespace Luna.ViewModels;
 public sealed class MainViewModel : ObservableObject
 {
     private readonly ManifestService _manifests = new();
+    private readonly AccountStore _accounts = new();
 
     private string _username = string.Empty;
     private bool _isMicrosoft;
@@ -20,6 +21,14 @@ public sealed class MainViewModel : ObservableObject
         ConnectMicrosoftCommand = new RelayCommand(ConnectMicrosoft);
         UseOfflineCommand = new RelayCommand(() => IsMicrosoft = false);
         UseMicrosoftCommand = new RelayCommand(() => IsMicrosoft = true);
+
+        var saved = _accounts.Load();
+        if (saved is { Kind: AccountKind.Offline, Username.Length: >= 3 })
+        {
+            _username = saved.Username;
+            Raise(nameof(Username));
+            Raise(nameof(UuidText));
+        }
 
         _ = LoadManifestAsync();
     }
@@ -41,7 +50,18 @@ public sealed class MainViewModel : ObservableObject
         set
         {
             if (!Set(ref _username, value)) return;
+            Raise(nameof(UuidText));
+            Persist();
             Refresh();
+        }
+    }
+
+    public string UuidText
+    {
+        get
+        {
+            var name = _username.Trim();
+            return name.Length >= 3 ? "UUID " + OfflineIdentity.UuidFor(name) : "UUID —";
         }
     }
 
@@ -82,6 +102,13 @@ public sealed class MainViewModel : ObservableObject
     public string VersionLabel => AppInfo.Version;
 
     public bool CanPlay => _manifest is not null && !_isMicrosoft && _username.Trim().Length >= 3;
+
+    private void Persist()
+    {
+        var name = _username.Trim();
+        if (name.Length < 3) return;
+        _accounts.Save(new Account(AccountKind.Offline, name, OfflineIdentity.UuidFor(name)));
+    }
 
     private async Task LoadManifestAsync()
     {
