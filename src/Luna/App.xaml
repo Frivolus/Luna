@@ -1,93 +1,14 @@
 ﻿<Application x:Class="Luna.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="Bg" Color="#111317" />
-        <SolidColorBrush x:Key="Panel" Color="#191C21" />
-        <SolidColorBrush x:Key="Line" Color="#262A31" />
-        <SolidColorBrush x:Key="Ink" Color="#E7EAEF" />
-        <SolidColorBrush x:Key="Muted" Color="#8A93A0" />
-        <SolidColorBrush x:Key="Accent" Color="#5B8CFF" />
-
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#0D0F12" />
-            <Setter Property="Foreground" Value="{StaticResource Ink}" />
-            <Setter Property="CaretBrush" Value="{StaticResource Ink}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Line}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,8" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6">
-                            <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="Tab" TargetType="RadioButton">
-            <Setter Property="Foreground" Value="{StaticResource Muted}" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="b" Background="Transparent" BorderBrush="{StaticResource Line}"
-                                BorderThickness="1" CornerRadius="6" Padding="14,8">
-                            <ContentPresenter HorizontalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="b" Property="Background" Value="#1E2A44" />
-                                <Setter TargetName="b" Property="BorderBrush" Value="{StaticResource Accent}" />
-                                <Setter Property="Foreground" Value="{StaticResource Ink}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="Action" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource Panel}" />
-            <Setter Property="Foreground" Value="{StaticResource Ink}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Line}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="14,8" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="Play" TargetType="Button" BasedOn="{StaticResource Action}">
-            <Setter Property="Background" Value="{StaticResource Accent}" />
-            <Setter Property="Foreground" Value="#0A0C10" />
-            <Setter Property="FontSize" Value="17" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Padding" Value="0,14" />
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#23272E" />
-                    <Setter Property="Foreground" Value="#6C7480" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

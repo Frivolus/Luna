@@ -12,10 +12,20 @@ public sealed class MainViewModel : ObservableObject
     {
         PlayCommand = new RelayCommand(Play, () => CanPlay);
         ConnectMicrosoftCommand = new RelayCommand(ConnectMicrosoft);
+        UseOfflineCommand = new RelayCommand(() => IsMicrosoft = false);
+        UseMicrosoftCommand = new RelayCommand(() => IsMicrosoft = true);
     }
 
     public RelayCommand PlayCommand { get; }
     public RelayCommand ConnectMicrosoftCommand { get; }
+    public RelayCommand UseOfflineCommand { get; }
+    public RelayCommand UseMicrosoftCommand { get; }
+
+    public Wpf.Ui.Controls.ControlAppearance OfflineAppearance
+        => _isMicrosoft ? Wpf.Ui.Controls.ControlAppearance.Secondary : Wpf.Ui.Controls.ControlAppearance.Primary;
+
+    public Wpf.Ui.Controls.ControlAppearance MicrosoftAppearance
+        => _isMicrosoft ? Wpf.Ui.Controls.ControlAppearance.Primary : Wpf.Ui.Controls.ControlAppearance.Secondary;
 
     public string Username
     {
@@ -34,6 +44,8 @@ public sealed class MainViewModel : ObservableObject
         {
             if (!Set(ref _isMicrosoft, value)) return;
             Raise(nameof(IsOffline));
+            Raise(nameof(OfflineAppearance));
+            Raise(nameof(MicrosoftAppearance));
             Refresh();
         }
     }

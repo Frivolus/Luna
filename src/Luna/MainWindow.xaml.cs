@@ -1,9 +1,9 @@
-﻿using System.Windows;
-using Luna.ViewModels;
+﻿using Luna.ViewModels;
+using Wpf.Ui.Controls;
 
 namespace Luna;
 
-public partial class MainWindow : Window
+public partial class MainWindow : FluentWindow
 {
     public MainWindow()
     {
