@@ -1,12 +1,18 @@
-﻿using Luna.Mvvm;
+﻿using Luna.Models;
+using Luna.Mvvm;
+using Luna.Services;
 
 namespace Luna.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
+    private readonly ManifestService _manifests = new();
+
     private string _username = string.Empty;
     private bool _isMicrosoft;
     private string _status = "Choisis un pseudo pour jouer hors-ligne.";
+    private string _versionText = "Chargement du manifeste...";
+    private Manifest? _manifest;
 
     public MainViewModel()
     {
@@ -14,6 +20,8 @@ public sealed class MainViewModel : ObservableObject
         ConnectMicrosoftCommand = new RelayCommand(ConnectMicrosoft);
         UseOfflineCommand = new RelayCommand(() => IsMicrosoft = false);
         UseMicrosoftCommand = new RelayCommand(() => IsMicrosoft = true);
+
+        _ = LoadManifestAsync();
     }
 
     public RelayCommand PlayCommand { get; }
@@ -65,14 +73,40 @@ public sealed class MainViewModel : ObservableObject
         private set => Set(ref _status, value);
     }
 
-    public bool CanPlay => _isMicrosoft ? false : _username.Trim().Length >= 3;
+    public string VersionText
+    {
+        get => _versionText;
+        private set => Set(ref _versionText, value);
+    }
 
-    public string VersionLabel => "0.1.0";
+    public string VersionLabel => AppInfo.Version;
+
+    public bool CanPlay => _manifest is not null && !_isMicrosoft && _username.Trim().Length >= 3;
+
+    private async Task LoadManifestAsync()
+    {
+        var result = await _manifests.LoadAsync(AppInfo.ManifestUrl, CancellationToken.None);
+
+        if (!result.Ok || result.Value is null)
+        {
+            _manifest = null;
+            VersionText = "Manifeste indisponible";
+            Status = result.Error ?? "Manifeste indisponible.";
+            Refresh();
+            return;
+        }
+
+        _manifest = result.Value;
+        VersionText = $"{_manifest.Name} — Minecraft {_manifest.McVersion} ({_manifest.Loader})";
+        Refresh();
+    }
 
     private void Refresh()
     {
         PlayCommand.RaiseCanExecuteChanged();
         Raise(nameof(CanPlay));
+
+        if (_manifest is null) return;
 
         if (_isMicrosoft)
             Status = "Compte Microsoft : non connecte.";
