@@ -1,8 +1,11 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using Luna.Services;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using MessageBox = System.Windows.MessageBox;
+using MessageBoxButton = System.Windows.MessageBoxButton;
+using MessageBoxResult = System.Windows.MessageBoxResult;
 
 namespace Luna;
 
@@ -38,12 +41,45 @@ public partial class App : Application
         var window = new MainWindow();
         MainWindow = window;
         window.Show();
+
+        if (!e.Args.Contains("--no-update"))
+            _ = CheckUpdatesAsync(window);
     }
 
     private static string GameDirectory => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Luna", "game");
 
     private static string LogPath => Path.Combine(Path.GetTempPath(), "luna-sync.log");
+
+    private async Task CheckUpdatesAsync(Window owner)
+    {
+        var service = new UpdateService();
+        var info = await service.CheckAsync(CancellationToken.None);
+        if (info is null)
+            return;
+
+        var answer = owner.Dispatcher.Invoke(() => MessageBox.Show(
+            owner,
+            $"La version {info.Version} est disponible. L'installer maintenant ?",
+            "Mise a jour",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Information));
+
+        if (answer != MessageBoxResult.Yes)
+            return;
+
+        var directory = await service.DownloadAsync(info, CancellationToken.None);
+        if (directory is null)
+        {
+            owner.Dispatcher.Invoke(() => MessageBox.Show(
+                owner, "Le telechargement de la mise a jour a echoue.", "Mise a jour",
+                MessageBoxButton.OK, MessageBoxImage.Warning));
+            return;
+        }
+
+        service.Apply(directory);
+        Shutdown(0);
+    }
 
     private async Task RunHeadlessLaunchAsync(string[] args)
     {
