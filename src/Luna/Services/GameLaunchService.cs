@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Net.Http;
 using CmlLib.Core;
 using CmlLib.Core.Auth;
+using CmlLib.Core.Installers;
+using CmlLib.Core.ModLoaders.FabricMC;
 using CmlLib.Core.ProcessBuilder;
 using Luna.Models;
 
@@ -14,6 +17,8 @@ public sealed record LaunchResult(bool Ok, string? Error, Process? Process)
 
 public sealed class GameLaunchService
 {
+    private static readonly HttpClient Http = new();
+
     public async Task<LaunchResult> PrepareAsync(Manifest manifest, string gameDirectory, MSession session,
                                                  Action<string> onFile, Action<int, int> onFiles,
                                                  CancellationToken cancellationToken)
@@ -27,10 +32,19 @@ public sealed class GameLaunchService
             onFile(args.Name ?? string.Empty);
         };
 
-        var version = await launcher.GetVersionAsync(manifest.McVersion, cancellationToken)
-            .ConfigureAwait(false);
+        var versionName = manifest.McVersion;
 
-        // InstallAsync extrait aussi le runtime Java fourni par Mojang.
+        if (manifest.Loader == LoaderKind.Fabric)
+        {
+            onFile("installation du loader Fabric");
+            var fabric = new FabricInstaller(Http);
+            versionName = string.IsNullOrWhiteSpace(manifest.LoaderVersion)
+                ? await fabric.Install(manifest.McVersion, path).ConfigureAwait(false)
+                : await fabric.Install(manifest.McVersion, manifest.LoaderVersion, path).ConfigureAwait(false);
+        }
+
+        var version = await launcher.GetVersionAsync(versionName, cancellationToken).ConfigureAwait(false);
+
         await launcher.InstallAsync(version, cancellationToken).ConfigureAwait(false);
 
         var java = launcher.GetJavaPath(version);
@@ -52,7 +66,6 @@ public sealed class GameLaunchService
         };
 
         var process = launcher.BuildProcess(version, option);
-
         return LaunchResult.Success(process);
     }
 }

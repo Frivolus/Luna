@@ -1,39 +1,20 @@
-﻿# ETAT DU PROJET
-
-> **Lu par l'agent AVANT toute modification. Mis a jour APRES chaque tache.**
-
-## Position
-
-- Phase : 0 — fondations
-- Derniere action : lancement valide, jeu demarre (runtime java auto-installe)
-- Prochaine action : cabler Play sur sync + lancement, journal de sortie dans l UI
+# Etat
 
 ## Fait
+- Shell WPF + WPF-UI (Mica, dark)
+- Manifeste distant + validation stricte
+- Compte hors-ligne (UUID MD5 deterministe) + persistance
+- Compte Microsoft (device flow WebView2)
+- Sync sha1 + nettoyage des obsoletes + mode headless --sync
+- Lancement du jeu + runtime Java Mojang automatique
+- UI Play + journal in-app
+- Support loader Fabric (FabricInstaller, namespace CmlLib.Core.ModLoaders.FabricMC)
+- Teste de bout en bout : Fabric 0.16.5 / 1.21.1 installe, processus lance, jeu demarre
 
-- [x] Depot public cree
-- [x] Solution, projet WPF net10.0-windows, .gitignore
-- [x] CmlLib.Core 4.1.0
-- [x] Regles et memoire de travail
+## En cours
+- rien
 
-## A faire (ordre impose)
-
-- [x] Coquille WPF : fenetre, selection de compte, Play desactive
-- [x] Modele de manifeste + lecture distante et validation
-- [x] Compte hors-ligne (pseudo, UUID deterministe, persistance)
-- [x] Compte Microsoft (WebView2, restauration silencieuse)
-- [x] Synchronisation des mods avec verification sha1
-- [x] Lancement via CmlLib (installation, runtime java auto)
-- [ ] Journal de sortie, erreurs, progression
-- [ ] Publication : installeur + manifeste via GitHub Actions
-
-## Conventions figees
-
-- C# 13, .NET 10, WPF, x64. Aucune dependance externe non validee.
-- `PascalCase` membres publics, `_camelCase` champs prives, `async` de bout en bout.
-- MVVM leger, pas de logique dans le code-behind.
-- Aucun secret commite.
-- Un commit = une brique. Messages `type: portee - description`.
-
-## Journal
-
-- 09/11/2026 : depot cree, scaffold, build verte.
+## A faire
+- Publication : GitHub Actions produisant installeur + manifeste
+- Manifeste reel : mods et assets heberges dans les Releases GitHub
+- Lunar (injecteur) : patch de selection de thread applique mais jamais commite ni teste
