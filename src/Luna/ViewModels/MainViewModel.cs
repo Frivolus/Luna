@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows;
 using CmlLib.Core.Auth;
 using Luna.Models;
 using Luna.Mvvm;
@@ -12,6 +14,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly AccountStore _accounts = new();
     private readonly MicrosoftAuthService _microsoft = new();
     private readonly FileSyncService _sync = new();
+    private readonly GameLaunchService _launch = new();
 
     private string _username = string.Empty;
     private bool _isMicrosoft;
@@ -21,6 +24,8 @@ public sealed class MainViewModel : ObservableObject
     private MSession? _session;
     private bool _isBusy;
     private double _progressValue;
+
+    public ObservableCollection<string> LogLines { get; } = new();
 
     public MainViewModel()
     {
@@ -217,12 +222,32 @@ public sealed class MainViewModel : ObservableObject
             Status = "Pseudo trop court (3 caracteres minimum).";
     }
 
+    private void AppendLog(string line)
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null) return;
+
+        dispatcher.Invoke(() =>
+        {
+            LogLines.Add(line);
+            while (LogLines.Count > 400) LogLines.RemoveAt(0);
+        });
+    }
+
     private async Task PlayAsync()
     {
         if (_manifest is null) return;
 
+        var session = _isMicrosoft ? _session : SessionFactory.Offline(_username.Trim());
+        if (session is null)
+        {
+            Status = "Aucun compte connecte.";
+            return;
+        }
+
         IsBusy = true;
         ProgressValue = 0;
+        LogLines.Clear();
 
         try
         {
@@ -232,11 +257,38 @@ public sealed class MainViewModel : ObservableObject
                 Status = p.Current == "termine" ? "Fichiers a jour." : "Synchronisation : " + p.Current;
             });
 
-            var result = await _sync.ApplyAsync(_manifest, GameDirectory, progress, CancellationToken.None);
+            var synced = await _sync.ApplyAsync(_manifest, GameDirectory, progress, CancellationToken.None);
+            if (!synced.Ok)
+            {
+                Status = "Echec de synchronisation : " + synced.Error;
+                return;
+            }
 
-            Status = result.Ok
-                ? "Fichiers a jour. Lancement pas encore implemente."
-                : "Echec de synchronisation : " + result.Error;
+            Status = "Preparation du jeu...";
+            ProgressValue = 0;
+
+            var prepared = await _launch.PrepareAsync(_manifest, GameDirectory, session,
+                file => { },
+                (done, total) => ProgressValue = total == 0 ? 0 : done * 100.0 / total,
+                CancellationToken.None);
+
+            if (!prepared.Ok || prepared.Process is null)
+            {
+                Status = "Echec du lancement : " + prepared.Error;
+                return;
+            }
+
+            var wrapper = new CmlLib.Core.ProcessBuilder.ProcessWrapper(prepared.Process);
+            wrapper.OutputReceived += (_, line) => AppendLog(line);
+            wrapper.StartWithEvents();
+
+            AppendLog("Jeu demarre (pid " + prepared.Process.Id + ")");
+            Status = "Jeu en cours.";
+        }
+        catch (Exception ex)
+        {
+            Status = "Echec : " + ex.Message;
+            AppendLog("exception: " + ex);
         }
         finally
         {
