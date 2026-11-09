@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Luna/Luna.csproj" />
+  </Folder>
+</Solution>
