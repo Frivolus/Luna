@@ -70,3 +70,10 @@
 - Manifeste : modele, lecture HTTP, validation stricte (schema, version, RAM, chemins, sha1, https), manifest.json a la racine.
 - Compte hors-ligne : UUID v3 MD5 de "OfflinePlayer:<pseudo>", persistance dans %APPDATA%\Luna\account.json, restauration au demarrage.
 - Prochain chantier : compte Microsoft (CmlLib.Core.Auth.Microsoft, device code).
+
+## Mise a jour 09/11/2026 (2)
+
+- Sync validee en headless : telechargement, verification sha1, idempotence, suppression des obsoletes dans les dossiers geres (mods, config, resourcepacks, shaderpacks), preservation du reste.
+- Mode `--sync` ajoute pour tester sans UI. `StartupUri` retire du XAML : WPF refuse `StartupUri = null`, la fenetre est creee a la main.
+- `JsonStringEnumConverter` requis sur `LoaderKind`.
+- Prochain chantier : lancement via CmlLib (CreateProcessAsync + MLaunchOption).

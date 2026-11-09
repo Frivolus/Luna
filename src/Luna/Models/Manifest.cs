@@ -2,6 +2,7 @@
 
 namespace Luna.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter<LoaderKind>))]
 public enum LoaderKind
 {
     Vanilla,

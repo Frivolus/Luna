@@ -5,8 +5,8 @@
 ## Position
 
 - Phase : 0 — fondations
-- Derniere action : compte hors-ligne (UUID deterministe, persistance) et manifeste distant
-- Prochaine action : compte Microsoft via device code
+- Derniere action : synchronisation sha1 validee (telechargement, idempotence, nettoyage), mode --sync
+- Prochaine action : lancement du jeu via CmlLib
 
 ## Fait
 
@@ -20,8 +20,8 @@
 - [x] Coquille WPF : fenetre, selection de compte, Play desactive
 - [x] Modele de manifeste + lecture distante et validation
 - [x] Compte hors-ligne (pseudo, UUID deterministe, persistance)
-- [ ] Compte Microsoft via device code
-- [ ] Synchronisation des mods avec verification sha1
+- [x] Compte Microsoft (WebView2, restauration silencieuse)
+- [x] Synchronisation des mods avec verification sha1
 - [ ] Lancement via CmlLib
 - [ ] Journal de sortie, erreurs, progression
 - [ ] Publication : installeur + manifeste via GitHub Actions

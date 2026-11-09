@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Windows;
-using Luna.Models;
 using Luna.Services;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -12,13 +11,26 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        ApplicationThemeManager.Apply(ApplicationTheme.Dark, WindowBackdropType.Mica, true);
+
+        try
+        {
+            ApplicationThemeManager.Apply(ApplicationTheme.Dark, WindowBackdropType.Mica, true);
+        }
+        catch (Exception ex)
+        {
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), "luna-theme.log"), ex.ToString());
+        }
 
         if (e.Args.Contains("--sync"))
         {
-            StartupUri = null;
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
             _ = RunHeadlessSyncAsync();
+            return;
         }
+
+        var window = new MainWindow();
+        MainWindow = window;
+        window.Show();
     }
 
     private static string GameDirectory => Path.Combine(
